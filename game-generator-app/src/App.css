@@ -1,24 +1,29 @@
+/* Allmänna stilar */
 :root {
-  --primary-color: #1faa36;
-  --secondary-color: #f5f5f5; /* En ljusgrå färg */
+  --primary-color: #34c234;
+  --secondary-color: #2c3e50;
+  --accent-color: #f39c12;
   --text-color: #333;
   --light-text-color: #fff;
+  --background-color: #f4f7f9;
+  --card-background: #fff;
+  --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   --border-radius: 8px;
-  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--secondary-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background-color);
   color: var(--text-color);
   margin: 0;
   padding: 0;
+  line-height: 1.6;
 }
 
 .app-container {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .header {
@@ -26,57 +31,105 @@ body {
   color: var(--light-text-color);
   padding: 1.5rem;
   text-align: center;
-  border-radius: var(--border-radius);
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
   margin-bottom: 2rem;
   box-shadow: var(--box-shadow);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2.5rem;
 }
 
 .main-content {
-  background-color: #fff;
   padding: 2rem;
+  background-color: var(--card-background);
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
 }
 
-.input-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+.footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding: 1rem;
+  color: var(--secondary-color);
 }
 
-.centered-input {
+/* Knappstilar */
+.generic-button {
+  background-color: var(--primary-color);
+  color: var(--light-text-color);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  align-self: center;
+  margin-top: 1rem;
+}
+
+.generic-button:hover {
+  background-color: #2c9835;
+}
+
+.button-container {
   display: flex;
-  flex-direction: column;
-  align-items: center; 
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.back-button {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.back-button:hover {
+  background-color: var(--primary-color);
+  color: var(--light-text-color);
+}
+
+.save-pdf-button {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+/* Formulärstilar */
+.input-group {
+  margin-bottom: 1.5rem;
 }
 
 .input-group label {
+  display: block;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  text-align: center;
 }
 
-input[type="number"],
-input[type="text"] {
+.input-group input,
+.input-group textarea {
+  width: 100%;
   padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: var(--border-radius);
   font-size: 1rem;
 }
 
+.centered-input {
+  max-width: 200px;
+  margin: 0 auto 1.5rem;
+}
+
 .team-names-grid-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
 .team-names-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  width: 100%;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
 }
 
 .team-input-group {
@@ -84,72 +137,55 @@ input[type="text"] {
   flex-direction: column;
 }
 
-.generate-button {
-  background-color: var(--primary-color);
-  color: var(--light-text-color);
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  align-self: center; 
+.team-input-group label {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
 }
 
-.save-pdf-button {
-  background-color: var(--primary-color);
-  color: var(--light-text-color);
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  align-self: center; 
-}
-
-.generate-button:hover {
-  background-color: #2c3e98;
-}
-
-.save-pdf-button:hover {
-  background-color: #2c3e98;
-}
-
-.error-message {
-  color: #d32f2f;
-  background-color: #ffebee;
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  margin-top: 1rem;
-}
-
-.schedule-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 2rem;
+/* Resultatsektioner (Spelschema och Laguppdelning) */
+.schedule-section {
   margin-top: 2rem;
 }
 
+.schedule-section h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--secondary-color);
+  font-size: 2rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.schedule-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  align-items: stretch; /* Se till att alla kort har samma höjd */
+}
+
 .round-card {
-  background-color: var(--secondary-color);
+  background-color: #f0f0f0;
   padding: 1.5rem;
   border-radius: var(--border-radius);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid #ddd;
+  flex-basis: 300px;
+  min-height: 200px; /* SÄTT EN MINIMIHÖJD HÄR */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex-grow: 1;
 }
 
 .round-card h3 {
   margin-top: 0;
+  font-size: 1.5rem;
   color: var(--primary-color);
   border-bottom: 2px solid #ddd;
   padding-bottom: 0.5rem;
 }
 
 .match-list {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
-  margin: 0;
+  margin-top: 1rem;
 }
 
 .match-item {
@@ -157,7 +193,7 @@ input[type="text"] {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 0;
-  border-bottom: 1px dashed #ccc;
+  border-bottom: 1px solid #ddd;
 }
 
 .match-item:last-child {
@@ -165,68 +201,29 @@ input[type="text"] {
 }
 
 .team-name {
-  font-weight: 500;
-  flex: 1;
-  text-align: center;
+  font-weight: bold;
 }
 
 .vs-text {
   font-style: italic;
-  font-size: 0.85rem;
-  color: #777;
-  margin: 0 1rem;
+  color: #888;
 }
 
-.footer {
+/* Laguppdelning */
+.rosters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+/* Felmeddelanden */
+.error-message {
   text-align: center;
-  padding: 1.5rem;
-  margin-top: 2rem;
-  color: #777;
-  font-size: 0.9rem;
-}
-
-/* --- PDF-specifika stilar --- */
-@media print {
-  /* Generella justeringar för utskrift */
-  body {
-    background-color: #fff;
-    color: #000;
-  }
-  
-  .app-container, .main-content {
-    box-shadow: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  /* Döljer element som inte behövs i PDF:en */
-  .header, .footer, .input-section, .error-message, .generate-button, .save-pdf-button {
-    display: none;
-  }
-
-  /* Justerar layouten för spelschemat för bättre PDF-generering */
-  .schedule-container {
-    display: flex; /* Ändra till flexbox */
-    flex-direction: column; /* Staplar innehållet vertikalt */
-    margin-top: 1rem;
-    gap: 1rem;
-  }
-
-  /* Förhindrar att omgångskort bryts upp över sidor */
-  .round-card {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    margin-bottom: 1rem;
-    border: 1px solid #ddd; /* Behåller gränsen på korten */
-  }
-
-  .round-card h3 {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.25rem;
-    font-size: 1.1rem;
-  }
-
-  .round-card, .match-item, .team-name {
-    box-shadow: none; /* Tar bort eventuella skuggor */
-  }
+  color: #e74c3c;
+  background-color: #fce8e8;
+  padding: 1rem;
+  border: 1px solid #e74c3c;
+  border-radius: var(--border-radius);
+  margin-top: 1.5rem;
 }
