@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/GameGeneratorAPP/static/css/main.1b72ae9d.css",
+    "main.js": "/GameGeneratorAPP/static/js/main.ab9a5d91.js",
+    "static/js/239.0615ec0f.chunk.js": "/GameGeneratorAPP/static/js/239.0615ec0f.chunk.js",
+    "static/js/977.3bb09007.chunk.js": "/GameGeneratorAPP/static/js/977.3bb09007.chunk.js",
+    "static/js/732.0aa21a9b.chunk.js": "/GameGeneratorAPP/static/js/732.0aa21a9b.chunk.js",
+    "static/js/453.1b451c34.chunk.js": "/GameGeneratorAPP/static/js/453.1b451c34.chunk.js",
+    "index.html": "/GameGeneratorAPP/index.html",
+    "main.1b72ae9d.css.map": "/GameGeneratorAPP/static/css/main.1b72ae9d.css.map",
+    "main.ab9a5d91.js.map": "/GameGeneratorAPP/static/js/main.ab9a5d91.js.map",
+    "239.0615ec0f.chunk.js.map": "/GameGeneratorAPP/static/js/239.0615ec0f.chunk.js.map",
+    "977.3bb09007.chunk.js.map": "/GameGeneratorAPP/static/js/977.3bb09007.chunk.js.map",
+    "732.0aa21a9b.chunk.js.map": "/GameGeneratorAPP/static/js/732.0aa21a9b.chunk.js.map",
+    "453.1b451c34.chunk.js.map": "/GameGeneratorAPP/static/js/453.1b451c34.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1b72ae9d.css",
+    "static/js/main.ab9a5d91.js"
+  ]
+}
