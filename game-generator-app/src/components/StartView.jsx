@@ -13,6 +13,9 @@ const StartView = ({ onSelectView }) => {
         <Button onClick={() => onSelectView('generate-schedule')}>
           Generera spelschema
         </Button>
+        <Button onClick={() => onSelectView('generate-kiosk')}>
+            Generera kioskschema
+        </Button>
       </div>
     </div>
   );

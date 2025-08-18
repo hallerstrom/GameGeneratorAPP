@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import StartView from './components/StartView';
 import TeamGenerator from './components/TeamGenerator';
 import ScheduleGenerator from './components/ScheduleGenerator';
+import KioskGenerator from './components/KioskGenerator'; 
 import Button from './components/Button';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   const [teamNames, setTeamNames] = useState([]);
   const [players, setPlayers] = useState(['']);
   const [schedule, setSchedule] = useState(null);
+  const [kioskSchedule, setKioskSchedule] = useState(null); 
   const [error, setError] = useState('');
   const [generatedTeams, setGeneratedTeams] = useState([]);
 
@@ -21,6 +23,7 @@ function App() {
     setNumTeams('');
     setTeamNames([]);
     setSchedule(null);
+    setKioskSchedule(null);
     setGeneratedTeams([]);
     setError('');
   };
@@ -80,6 +83,63 @@ function App() {
 
     setGeneratedTeams(newTeams);
     setSchedule(null);
+  };
+
+  const handleGenerateKioskSchedule = ({ startTime, endTime, people }) => {
+    setError('');
+    setKioskSchedule(null);
+    setGeneratedTeams([]);
+    const cleanedPeople = people.filter(p => p.trim() !== '');
+
+    const start = new Date(`1970-01-01T${startTime}`);
+    const end = new Date(`1970-01-01T${endTime}`);
+
+    if (start >= end) {
+      setError('Sluttiden måste vara efter starttiden.');
+      return;
+    }
+    if (cleanedPeople.length === 0) {
+      setError('Minst en person måste anges.');
+      return;
+    }
+    
+    const totalMinutes = (end - start) / 1000 / 60;
+    const shiftDuration = Math.floor(totalMinutes / cleanedPeople.length);
+
+    if (shiftDuration === 0) {
+        setError('Tidsintervallet är för kort för att delas upp på så många personer.');
+        return;
+    }
+
+    const shuffledPeople = [...cleanedPeople].sort(() => 0.5 - Math.random());
+    
+    const newSchedule = [];
+    let currentTime = new Date(start);
+
+    for (let i = 0; i < shuffledPeople.length; i++) {
+      const shiftStart = new Date(currentTime);
+      const shiftEnd = new Date(currentTime.getTime() + shiftDuration * 60000);
+      const person = shuffledPeople[i];
+
+      const formattedStartTime = shiftStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const formattedEndTime = shiftEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      newSchedule.push({
+        time: `${formattedStartTime} - ${formattedEndTime}`,
+        person: person
+      });
+
+      currentTime = shiftEnd;
+    }
+    
+    const remainingMinutes = totalMinutes % cleanedPeople.length;
+    if (remainingMinutes > 0 && newSchedule.length > 0) {
+      const lastShift = newSchedule[newSchedule.length - 1];
+      const lastShiftEnd = new Date(new Date(`1970-01-01T${lastShift.time.split(' - ')[1]}`).getTime() + remainingMinutes * 60000);
+      lastShift.time = `${lastShift.time.split(' - ')[0]} - ${lastShiftEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    setKioskSchedule(newSchedule);
   };
 
   const generateSimulatedSchedule = (teams) => {
@@ -168,6 +228,26 @@ function App() {
     doc.save('lagindelning.pdf');
   };
 
+  const handleSaveKioskPdf = () => {
+    const doc = new jsPDF();
+    const margin = 20;
+    let yPos = margin;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    doc.setFontSize(22);
+    doc.text('Kioskschema', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 20;
+    doc.setFontSize(14);
+    kioskSchedule.forEach((shift, index) => {
+      if (yPos > doc.internal.pageSize.getHeight() - 20) {
+        doc.addPage();
+        yPos = margin;
+      }
+      doc.text(`${shift.person} | ${shift.time}`, margin, yPos);
+      yPos += 10;
+    });
+    doc.save('kioskschema.pdf');
+  };
+
   return (
     <div className="app-container">
       <header className="header">
@@ -193,6 +273,12 @@ function App() {
             handleNumTeamsChange={handleNumTeamsChange}
             handleTeamNameChange={handleTeamNameChange}
             onGenerateSchedule={handleGenerateSchedule}
+            onBack={() => handleSetView('start')}
+          />
+        )}
+        {view === 'generate-kiosk' && ( // NY VY
+          <KioskGenerator
+            onGenerateKioskSchedule={handleGenerateKioskSchedule}
             onBack={() => handleSetView('start')}
           />
         )}
@@ -241,6 +327,29 @@ function App() {
             </div>
             <Button onClick={handleSaveSchedulePdf} className="save-pdf-button">
               Spara spelschema som PDF
+            </Button>
+          </div>
+        )}
+
+        {kioskSchedule && (
+          <div className="schedule-section">
+            <h2>Kioskschema</h2>
+            <div className="schedule-container">
+              <div className="round-card">
+                <h3>Schema</h3>
+                <ul className="match-list">
+                  {kioskSchedule.map((shift, index) => (
+                    <li key={index} className="match-item">
+                      <span className="team-name">{shift.person}</span>
+                      <span className="vs-text"></span>
+                      <span className="team-name">{shift.time}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <Button onClick={handleSaveKioskPdf} className="save-pdf-button">
+              Spara kioskschema som PDF
             </Button>
           </div>
         )}
