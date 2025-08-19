@@ -23,7 +23,7 @@ const KioskGenerator = ({ onGenerateKioskSchedule, onBack }) => {
 
   return (
     <div>
-      <h3>Skapa kioskutrustning</h3>
+      <h3>Skapa kioskschema</h3>
       <div className="input-group centered-input">
         <label htmlFor="startTime">Starttid:</label>
         <input
