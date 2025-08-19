@@ -306,7 +306,7 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <h1>Spelschema-generator</h1>
+        <h1>Poolspelsverktyget</h1>
       </header>
       
       <main className="main-content">
@@ -412,7 +412,7 @@ function App() {
       </main>
       
       <footer className="footer">
-        <p>Skapad med React och .NET</p>
+        <p>Skapad med React, Javascript och CSS</p>
       </footer>
     </div>
   );
