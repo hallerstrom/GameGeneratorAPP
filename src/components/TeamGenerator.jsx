@@ -7,7 +7,7 @@ const TeamGenerator = ({
   players,
   setPlayers,
   onGenerateTeams,
-  onBack, // NY PROP
+  onBack, 
 }) => {
   const handlePlayerNameChange = (e, index) => {
     const newPlayers = [...players];
@@ -50,11 +50,10 @@ const TeamGenerator = ({
         </div>
       </div>
       
-      <Button onClick={onGenerateTeams}>
-        Generera lag
+      <Button onClick={() => onGenerateTeams({ players: players, numTeams: numTeams })}>
+          Generera lag
       </Button>
-
-      {/* NY TILLBAKAKNAPP */}
+      
       <Button onClick={onBack} className="back-button">
         Tillbaka
       </Button>

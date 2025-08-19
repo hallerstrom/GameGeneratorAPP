@@ -50,6 +50,7 @@ function App() {
     useMatchTimes,
     firstMatchTime,
     pauseDuration,
+    matchDuration,
   }) => {
     setError('');
     setSchedule(null);
@@ -66,55 +67,62 @@ function App() {
         setError('Starttid måste anges.');
         return;
       }
-      if (pauseDuration === '' || isNaN(pauseDuration) || pauseDuration < 0) {
-        setError('Paustid måste anges och vara ett positivt nummer.');
+      if (
+        pauseDuration === '' || isNaN(pauseDuration) || pauseDuration < 0 ||
+        matchDuration === '' || isNaN(matchDuration) || matchDuration < 0
+      ) {
+        setError('Match- och paustid måste anges och vara positiva nummer.');
         return;
       }
     }
 
-    let simulatedSchedule = generateSimulatedSchedule(teams);
-
-    if (useMatchTimes) {
-      const totalDuration = 20 + pauseDuration; // Matchtid (20 min) + paus
-      let currentTime = new Date(`1970-01-01T${firstMatchTime}`);
-      
-      const allMatches = simulatedSchedule.flat();
-      const shuffledMatches = [...allMatches].sort(() => 0.5 - Math.random());
-      
-      let newSchedule = [];
-      let currentRound = [];
-      
-      shuffledMatches.forEach((match, index) => {
-        const matchStart = new Date(currentTime);
-        const matchEnd = new Date(currentTime.getTime() + 20 * 60000); // 20 min match
-
-        const matchStartTimeFormatted = matchStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const matchEndTimeFormatted = matchEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        
-        currentRound.push({
-          homeTeam: match.homeTeam,
-          awayTeam: match.awayTeam,
-          time: `${matchStartTimeFormatted} - ${matchEndTimeFormatted}`
-        });
-
-        currentTime = new Date(currentTime.getTime() + totalDuration * 60000);
-
-        // Skapar en ny omgång när rundan är full eller när alla matcher har schemalagts
-        if (currentRound.length === teams.length / 2 || index === shuffledMatches.length - 1) {
-          newSchedule.push(currentRound);
-          currentRound = [];
-        }
-      });
-      setSchedule(newSchedule);
-    } else {
-      setSchedule(simulatedSchedule);
+    let tempTeams = [...teams];
+    const rounds = [];
+    if (tempTeams.length % 2 !== 0) {
+      tempTeams.push(null);
     }
+    const numRounds = tempTeams.length - 1;
+    const half = tempTeams.length / 2;
+    for (let round = 0; round < numRounds; round++) {
+      const currentRound = [];
+      for (let i = 0; i < half; i++) {
+        const homeTeam = tempTeams[i];
+        const awayTeam = tempTeams[tempTeams.length - 1 - i];
+        if (homeTeam && awayTeam) {
+          currentRound.push({ homeTeam: homeTeam, awayTeam: awayTeam });
+        }
+      }
+      rounds.push(currentRound);
+      const last = tempTeams.pop();
+      tempTeams.splice(1, 0, last);
+    }
+    
+    if (useMatchTimes) {
+        let currentTime = new Date(`1970-01-01T${firstMatchTime}`);
+        
+        rounds.forEach(round => {
+          round.forEach(match => {
+            const matchStart = new Date(currentTime);
+            const matchEnd = new Date(currentTime.getTime() + matchDuration * 60000);
+
+            const matchStartTimeFormatted = matchStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const matchEndTimeFormatted = matchEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            match.time = `${matchStartTimeFormatted} - ${matchEndTimeFormatted}`;
+            
+            currentTime = new Date(matchEnd.getTime() + pauseDuration * 60000);
+          });
+        });
+    }
+
+    setSchedule(rounds);
   };
 
-  const handleGenerateTeams = () => {
+  const handleGenerateTeams = ({ numTeams, players }) => {
     setError('');
     setSchedule(null);
     setGeneratedTeams([]);
+    // FIX: players kommer nu som en prop och kan användas direkt
     const playersArray = players.filter((p) => p.trim() !== '');
     const numTeamsToCreate = parseInt(numTeams);
 
@@ -137,13 +145,11 @@ function App() {
     });
 
     setGeneratedTeams(newTeams);
-    setSchedule(null);
   };
 
   const handleGenerateKioskSchedule = ({ startTime, endTime, people }) => {
     setError('');
     setKioskSchedule(null);
-    setGeneratedTeams([]);
     const cleanedPeople = people.filter((p) => p.trim() !== '');
 
     const start = new Date(`1970-01-01T${startTime}`);
@@ -181,7 +187,7 @@ function App() {
 
       newSchedule.push({
         time: `${formattedStartTime} - ${formattedEndTime}`,
-        person: person
+        people: [person] 
       });
 
       currentTime = shiftEnd;
@@ -197,58 +203,56 @@ function App() {
     setKioskSchedule(newSchedule);
   };
 
-  const generateSimulatedSchedule = (teams) => {
-    let tempTeams = [...teams];
-    const rounds = [];
-    if (tempTeams.length % 2 !== 0) {
-      tempTeams.push(null);
-    }
-    const numRounds = tempTeams.length - 1;
-    const half = tempTeams.length / 2;
-    for (let round = 0; round < numRounds; round++) {
-      const currentRound = [];
-      for (let i = 0; i < half; i++) {
-        const homeTeam = tempTeams[i];
-        const awayTeam = tempTeams[tempTeams.length - 1 - i];
-        if (homeTeam && awayTeam) {
-          currentRound.push({ homeTeam: homeTeam, awayTeam: awayTeam });
-        }
-      }
-      rounds.push(currentRound);
-      const last = tempTeams.pop();
-      tempTeams.splice(1, 0, last);
-    }
-    return rounds;
-  };
-  
   const handleSaveSchedulePdf = () => {
     const doc = new jsPDF();
     const margin = 20;
     let yPos = margin;
     const pageWidth = doc.internal.pageSize.getWidth();
-    doc.setFontSize(22);
+    
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.setTextColor('#34495e'); 
     doc.text('Spelschema', pageWidth / 2, yPos, { align: 'center' });
     yPos += 20;
-    doc.setFontSize(12);
+
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(14);
+    
     schedule.forEach((round, index) => {
-      if (yPos > doc.internal.pageSize.getHeight() - 40) {
-        doc.addPage();
-        yPos = margin;
-      }
-      doc.setFontSize(16);
-      doc.text(`Omgång ${index + 1}`, margin, yPos);
-      yPos += 10;
-      doc.setFontSize(12);
-      round.forEach(match => {
-        if (yPos > doc.internal.pageSize.getHeight() - 20) {
-          doc.addPage();
-          yPos = margin;
+        if (yPos > doc.internal.pageSize.getHeight() - 40) {
+            doc.addPage();
+            yPos = margin;
         }
-        doc.text(`${match.homeTeam} vs ${match.awayTeam} ${match.time ? `(${match.time})` : ''}`, margin + 5, yPos);
+        
+        doc.setFillColor('#ecf0f1'); 
+        doc.rect(margin, yPos, pageWidth - 2 * margin, 8, 'F');
+        
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor('#34c234'); 
+        doc.text(`Omgång ${index + 1}`, margin + 5, yPos + 6);
+        yPos += 12;
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor('#333'); 
+        
+        round.forEach(match => {
+            if (yPos > doc.internal.pageSize.getHeight() - 20) {
+                doc.addPage();
+                yPos = margin;
+            }
+            
+            const matchText = `${match.homeTeam} vs ${match.awayTeam}`;
+            const timeText = match.time ? `(${match.time})` : '';
+            
+            doc.text(matchText, margin + 5, yPos);
+            doc.text(timeText, pageWidth - margin - 5, yPos, { align: 'right' });
+            yPos += 8;
+        });
         yPos += 10;
-      });
-      yPos += 5;
     });
+
     doc.save('spelschema.pdf');
   };
 
@@ -257,30 +261,47 @@ function App() {
     const margin = 20;
     let yPos = margin;
     const pageWidth = doc.internal.pageSize.getWidth();
-    doc.setFontSize(22);
+    
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.setTextColor('#34495e');
     doc.text('Laguppdelning', pageWidth / 2, yPos, { align: 'center' });
     yPos += 20;
+
+    doc.setFont('Helvetica', 'normal');
     doc.setFontSize(14);
-    generatedTeams.forEach((team, index) => {
-      if (yPos > doc.internal.pageSize.getHeight() - 60) {
-        doc.addPage();
-        yPos = margin;
-      }
-      doc.setFontSize(16);
-      doc.text(`Lag ${index + 1}`, margin, yPos);
-      yPos += 10;
-      doc.setFontSize(12);
-      team.forEach(player => {
-        if (yPos > doc.internal.pageSize.getHeight() - 20) {
-          doc.addPage();
-          yPos = margin;
+
+    generatedTeams.forEach((roster, index) => {
+        if (yPos > doc.internal.pageSize.getHeight() - 40) {
+            doc.addPage();
+            yPos = margin;
         }
-        doc.text(`- ${player}`, margin + 5, yPos);
-        yPos += 7;
-      });
-      yPos += 5;
+
+        doc.setFillColor('#ecf0f1'); 
+        doc.rect(margin, yPos, pageWidth - 2 * margin, 8, 'F');
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor('#34c234'); 
+        doc.text(`Lag ${index + 1}`, margin + 5, yPos + 6);
+        yPos += 12;
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor('#333'); 
+        
+        roster.forEach(player => {
+            if (yPos > doc.internal.pageSize.getHeight() - 20) {
+                doc.addPage();
+                yPos = margin;
+            }
+            doc.text(`- ${player}`, margin + 5, yPos);
+            yPos += 8;
+        });
+        yPos += 10;
     });
-    doc.save('lagindelning.pdf');
+
+    doc.save('laguppdelning.pdf');
   };
 
   const handleSaveKioskPdf = () => {
@@ -288,18 +309,41 @@ function App() {
     const margin = 20;
     let yPos = margin;
     const pageWidth = doc.internal.pageSize.getWidth();
-    doc.setFontSize(22);
+
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.setTextColor('#34495e'); 
     doc.text('Kioskschema', pageWidth / 2, yPos, { align: 'center' });
     yPos += 20;
+
+    doc.setFont('Helvetica', 'normal');
     doc.setFontSize(14);
-    kioskSchedule.forEach((shift, index) => {
-      if (yPos > doc.internal.pageSize.getHeight() - 20) {
-        doc.addPage();
-        yPos = margin;
-      }
-      doc.text(`${shift.person} | ${shift.time}`, margin, yPos);
-      yPos += 10;
+
+    kioskSchedule.forEach((period, index) => {
+        if (yPos > doc.internal.pageSize.getHeight() - 40) {
+            doc.addPage();
+            yPos = margin;
+        }
+
+        doc.setFillColor('#ecf0f1'); 
+        doc.rect(margin, yPos, pageWidth - 2 * margin, 8, 'F');
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor('#34c234'); 
+        doc.text(`Pass ${index + 1}`, margin + 5, yPos + 6);
+        yPos += 12;
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(12);
+        doc.setTextColor('#333');
+
+        doc.text(`Tid: ${period.time}`, margin + 5, yPos);
+        yPos += 8;
+        doc.text(`Personer: ${period.people.join(', ')}`, margin + 5, yPos);
+        yPos += 15;
     });
+
     doc.save('kioskschema.pdf');
   };
 
@@ -341,24 +385,24 @@ function App() {
         {error && <p className="error-message">{error}</p>}
         
         {generatedTeams.length > 0 && (
-            <div className="schedule-section">
-              <h2>Laguppdelning</h2>
-              <div className="schedule-container">
-                {generatedTeams.map((team, index) => (
-                  <div key={index} className="round-card">
-                    <h3>Lag {index + 1}</h3>
-                    <ul>
-                      {team.map((player, playerIndex) => (
-                        <li key={playerIndex}>{player}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-              <Button onClick={handleSaveRosterPdf} className="save-pdf-button">
-                Spara lagindelning som PDF
-              </Button>
+          <div className="schedule-section">
+            <h2>Laguppdelning</h2>
+            <div className="schedule-container">
+              {generatedTeams.map((team, index) => (
+                <div key={index} className="round-card">
+                  <h3>Lag {index + 1}</h3>
+                  <ul>
+                    {team.map((player, playerIndex) => (
+                      <li key={playerIndex}>{player}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
+            <Button onClick={handleSaveRosterPdf} className="save-pdf-button">
+              Spara lagindelning som PDF
+            </Button>
+          </div>
         )}
 
         {schedule && (
@@ -396,7 +440,7 @@ function App() {
                 <ul className="match-list">
                   {kioskSchedule.map((shift, index) => (
                     <li key={index} className="match-item">
-                      <span className="team-name">{shift.person}</span>
+                      <span className="team-name">{shift.people.join(', ')}</span>
                       <span className="vs-text"></span>
                       <span className="team-name">{shift.time}</span>
                     </li>

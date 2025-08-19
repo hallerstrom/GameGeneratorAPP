@@ -314,7 +314,7 @@ body {
   .team-names-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
-    display: grid; /* Återgå till grid för mobiler */
+    display: grid;
     justify-content: center;
   }
 
