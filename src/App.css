@@ -79,6 +79,7 @@ body {
   justify-content: center;
   gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .back-button {
@@ -115,26 +116,45 @@ body {
   border: 1px solid #ccc;
   border-radius: var(--border-radius);
   font-size: 1rem;
+  box-sizing: border-box;
 }
 
+/* Samma stil för alla input-fält */
+.team-input-group input,
+.schedule-time-inputs input,
+.centered-input input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+/* Uppdaterad stil för centrerat fält */
 .centered-input {
-  max-width: 200px;
+  max-width: 250px;
   margin: 0 auto 1.5rem;
+  text-align: center;
 }
 
 .team-names-grid-container {
   margin-bottom: 1.5rem;
 }
 
+/* Centrera team-names-grid */
 .team-names-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1.5rem;
 }
 
 .team-input-group {
   display: flex;
   flex-direction: column;
+  flex: 1 1 200px;
+  max-width: 250px;
 }
 
 .team-input-group label {
@@ -161,7 +181,7 @@ body {
   flex-wrap: wrap;
   justify-content: center;
   gap: 2rem;
-  align-items: stretch; /* Se till att alla kort har samma höjd */
+  align-items: stretch;
 }
 
 .round-card {
@@ -169,7 +189,7 @@ body {
   padding: 1.5rem;
   border-radius: var(--border-radius);
   flex-basis: 300px;
-  min-height: 200px; /* SÄTT EN MINIMIHÖJD HÄR */
+  min-height: 200px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   flex-grow: 1;
 }
@@ -209,6 +229,12 @@ body {
   color: #888;
 }
 
+.match-time {
+  font-size: 0.9rem;
+  color: #555;
+  margin-left: 0.5rem;
+}
+
 /* Laguppdelning */
 .rosters-container {
   display: flex;
@@ -226,4 +252,90 @@ body {
   border: 1px solid #e74c3c;
   border-radius: var(--border-radius);
   margin-top: 1.5rem;
+}
+
+/* Nya stilar för speltider */
+.schedule-options {
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.schedule-options label {
+  display: inline-flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.schedule-options input[type="checkbox"] {
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
+.schedule-time-inputs {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.schedule-time-inputs .input-group {
+  flex: 1;
+  max-width: 250px;
+}
+
+/* Mobilanpassning */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 0.5rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  .button-container {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .generic-button,
+  .back-button {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .team-names-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    display: grid; /* Återgå till grid för mobiler */
+    justify-content: center;
+  }
+
+  .schedule-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .round-card {
+    flex-basis: auto;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    font-size: 0.9rem;
+  }
+
+  .schedule-time-inputs {
+    flex-direction: column;
+    gap: 1rem;
+  }
 }

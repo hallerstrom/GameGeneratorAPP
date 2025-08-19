@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from './Button';
 
 const ScheduleGenerator = ({
@@ -7,11 +7,25 @@ const ScheduleGenerator = ({
   handleNumTeamsChange,
   handleTeamNameChange,
   onGenerateSchedule,
-  onBack, // NY PROP
+  onBack,
 }) => {
+  const [useMatchTimes, setUseMatchTimes] = useState(false);
+  const [firstMatchTime, setFirstMatchTime] = useState('');
+  const [pauseDuration, setPauseDuration] = useState('');
+
+  const handleGenerateClick = () => {
+    onGenerateSchedule({
+      numTeams: parseInt(numTeams),
+      teamNames: teamNames,
+      useMatchTimes,
+      firstMatchTime,
+      pauseDuration: parseInt(pauseDuration),
+    });
+  };
+
   return (
     <div>
-      <h3>Ange egna lag</h3>
+      <h3>Generera spelschema</h3>
       <div className="input-group centered-input">
         <label htmlFor="numTeams">Antal lag:</label>
         <input
@@ -23,32 +37,63 @@ const ScheduleGenerator = ({
         />
       </div>
 
-      {numTeams > 0 && teamNames.length > 0 && (
-        <>
-          <div className="team-names-grid-container">
-            <div className="team-names-grid">
-              {teamNames.map((name, index) => (
-                <div key={index} className="team-input-group">
-                  <label>Lag {index + 1}:</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => handleTeamNameChange(e, index)}
-                    placeholder="T.ex. VSK Fotboll"
-                  />
-                </div>
-              ))}
+      <div className="team-names-grid-container">
+        <div className="team-names-grid">
+          {teamNames.map((teamName, index) => (
+            <div key={index} className="team-input-group">
+              <label htmlFor={`team${index + 1}`}>Lag {index + 1}:</label>
+              <input
+                id={`team${index + 1}`}
+                type="text"
+                value={teamName}
+                onChange={(e) => handleTeamNameChange(e, index)}
+              />
             </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="schedule-options">
+        <label>
+          <input
+            type="checkbox"
+            checked={useMatchTimes}
+            onChange={(e) => setUseMatchTimes(e.target.checked)}
+          />
+          Lägg till speltider
+        </label>
+      </div>
+
+      {useMatchTimes && (
+        <div className="schedule-time-inputs">
+          <div className="input-group">
+            <label htmlFor="firstMatchTime">Starttid för första match:</label>
+            <input
+              id="firstMatchTime"
+              type="time"
+              value={firstMatchTime}
+              onChange={(e) => setFirstMatchTime(e.target.value)}
+            />
           </div>
-          <Button onClick={onGenerateSchedule}>
-            Generera spelschema
-          </Button>
-        </>
+          <div className="input-group">
+            <label htmlFor="pauseDuration">Paus mellan matcher (min):</label>
+            <input
+              id="pauseDuration"
+              type="number"
+              value={pauseDuration}
+              onChange={(e) => setPauseDuration(e.target.value)}
+              min="0"
+            />
+          </div>
+        </div>
       )}
-      {/* NY TILLBAKAKNAPP */}
-      <Button onClick={onBack} className="back-button">
-        Tillbaka
-      </Button>
+
+      <div className="button-container">
+        <Button onClick={handleGenerateClick}>Generera schema</Button>
+        <Button onClick={onBack} className="back-button">
+          Tillbaka
+        </Button>
+      </div>
     </div>
   );
 };
