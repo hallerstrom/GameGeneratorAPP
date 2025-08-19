@@ -4,7 +4,7 @@ import { jsPDF } from 'jspdf';
 import StartView from './components/StartView';
 import TeamGenerator from './components/TeamGenerator';
 import ScheduleGenerator from './components/ScheduleGenerator';
-import KioskGenerator from './components/KioskGenerator'; 
+import KioskGenerator from './components/KioskGenerator';
 import Button from './components/Button';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
   const [teamNames, setTeamNames] = useState([]);
   const [players, setPlayers] = useState(['']);
   const [schedule, setSchedule] = useState(null);
-  const [kioskSchedule, setKioskSchedule] = useState(null); 
+  const [kioskSchedule, setKioskSchedule] = useState(null);
   const [error, setError] = useState('');
   const [generatedTeams, setGeneratedTeams] = useState([]);
 
@@ -44,24 +44,78 @@ function App() {
     setTeamNames(newTeamNames);
   };
 
-  const handleGenerateSchedule = () => {
+  const handleGenerateSchedule = ({
+    numTeams,
+    teamNames,
+    useMatchTimes,
+    firstMatchTime,
+    pauseDuration,
+  }) => {
     setError('');
     setSchedule(null);
     setGeneratedTeams([]);
-    const teams = teamNames.filter(name => name.trim() !== '');
+
+    const teams = teamNames.filter((name) => name.trim() !== '');
     if (teams.length < 2) {
       setError('Minst två lag måste anges.');
       return;
     }
-    const simulatedSchedule = generateSimulatedSchedule(teams);
-    setSchedule(simulatedSchedule);
+
+    if (useMatchTimes) {
+      if (!firstMatchTime) {
+        setError('Starttid måste anges.');
+        return;
+      }
+      if (pauseDuration === '' || isNaN(pauseDuration) || pauseDuration < 0) {
+        setError('Paustid måste anges och vara ett positivt nummer.');
+        return;
+      }
+    }
+
+    let simulatedSchedule = generateSimulatedSchedule(teams);
+
+    if (useMatchTimes) {
+      const totalDuration = 20 + pauseDuration; // Matchtid (20 min) + paus
+      let currentTime = new Date(`1970-01-01T${firstMatchTime}`);
+      
+      const allMatches = simulatedSchedule.flat();
+      const shuffledMatches = [...allMatches].sort(() => 0.5 - Math.random());
+      
+      let newSchedule = [];
+      let currentRound = [];
+      
+      shuffledMatches.forEach((match, index) => {
+        const matchStart = new Date(currentTime);
+        const matchEnd = new Date(currentTime.getTime() + 20 * 60000); // 20 min match
+
+        const matchStartTimeFormatted = matchStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const matchEndTimeFormatted = matchEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        
+        currentRound.push({
+          homeTeam: match.homeTeam,
+          awayTeam: match.awayTeam,
+          time: `${matchStartTimeFormatted} - ${matchEndTimeFormatted}`
+        });
+
+        currentTime = new Date(currentTime.getTime() + totalDuration * 60000);
+
+        // Skapar en ny omgång när rundan är full eller när alla matcher har schemalagts
+        if (currentRound.length === teams.length / 2 || index === shuffledMatches.length - 1) {
+          newSchedule.push(currentRound);
+          currentRound = [];
+        }
+      });
+      setSchedule(newSchedule);
+    } else {
+      setSchedule(simulatedSchedule);
+    }
   };
 
   const handleGenerateTeams = () => {
     setError('');
     setSchedule(null);
     setGeneratedTeams([]);
-    const playersArray = players.filter(p => p.trim() !== '');
+    const playersArray = players.filter((p) => p.trim() !== '');
     const numTeamsToCreate = parseInt(numTeams);
 
     if (isNaN(numTeamsToCreate) || numTeamsToCreate <= 0) {
@@ -73,10 +127,11 @@ function App() {
       setError('Inte tillräckligt med spelare för att skapa så många lag.');
       return;
     }
+
     const shuffledPlayers = [...playersArray].sort(() => 0.5 - Math.random());
     const newTeams = Array.from({ length: numTeamsToCreate }, () => []);
     let teamIndex = 0;
-    shuffledPlayers.forEach(player => {
+    shuffledPlayers.forEach((player) => {
       newTeams[teamIndex].push(player);
       teamIndex = (teamIndex + 1) % numTeamsToCreate;
     });
@@ -89,7 +144,7 @@ function App() {
     setError('');
     setKioskSchedule(null);
     setGeneratedTeams([]);
-    const cleanedPeople = people.filter(p => p.trim() !== '');
+    const cleanedPeople = people.filter((p) => p.trim() !== '');
 
     const start = new Date(`1970-01-01T${startTime}`);
     const end = new Date(`1970-01-01T${endTime}`);
@@ -189,7 +244,7 @@ function App() {
           doc.addPage();
           yPos = margin;
         }
-        doc.text(`${match.homeTeam} vs ${match.awayTeam}`, margin + 5, yPos);
+        doc.text(`${match.homeTeam} vs ${match.awayTeam} ${match.time ? `(${match.time})` : ''}`, margin + 5, yPos);
         yPos += 10;
       });
       yPos += 5;
@@ -276,7 +331,7 @@ function App() {
             onBack={() => handleSetView('start')}
           />
         )}
-        {view === 'generate-kiosk' && ( // NY VY
+        {view === 'generate-kiosk' && (
           <KioskGenerator
             onGenerateKioskSchedule={handleGenerateKioskSchedule}
             onBack={() => handleSetView('start')}
@@ -319,6 +374,7 @@ function App() {
                         <span className="team-name">{match.homeTeam}</span>
                         <span className="vs-text">vs</span>
                         <span className="team-name">{match.awayTeam}</span>
+                        {match.time && <span className="match-time">({match.time})</span>}
                       </li>
                     ))}
                   </ul>
