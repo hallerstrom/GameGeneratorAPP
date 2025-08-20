@@ -120,7 +120,7 @@ const handleGenerateSchedule = ({
     });
   }
 
-  setGeneratedTeams(teams);
+  // setGeneratedTeams(teams);
   setSchedule(rounds);
 };
 
@@ -128,7 +128,7 @@ const handleGenerateSchedule = ({
   const handleGenerateTeams = ({ numTeams, players }) => {
     setError('');
     setSchedule(null);
-    setGeneratedTeams([]);
+    // setGeneratedTeams([]);
     // FIX: players kommer nu som en prop och kan användas direkt
     const playersArray = players.filter((p) => p.trim() !== '');
     const numTeamsToCreate = parseInt(numTeams);
