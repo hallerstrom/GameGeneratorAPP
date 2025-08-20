@@ -3,12 +3,12 @@ const CACHE_NAME = "poolspel-cache-v1";
 
 // Filer som ska cachas vid installation
 const urlsToCache = [
-  "/",
-  "/index.html",
-  "/styles.css",
-  "/app.js",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png"
+  "/Poolspelsverktyget/",
+  "/Poolspelsverktyget/index.html",
+  "/Poolspelsverktyget/styles.css",
+  "/Poolspelsverktyget/app.js",
+  "/Poolspelsverktyget/icons/icon-192.png",
+  "/Poolspelsverktyget/icons/icon-512.png"
 ];
 
 // Install event
@@ -35,7 +35,7 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// Fetch event (cachad first, fallback to network)
+// Fetch event (cache first, fallback to network)
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))
