@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/Poolspelsverktyget/static/css/main.762cb9ff.css",
-    "main.js": "/Poolspelsverktyget/static/js/main.b5bcaf27.js",
+    "main.js": "/Poolspelsverktyget/static/js/main.de8cfba8.js",
     "static/js/239.0615ec0f.chunk.js": "/Poolspelsverktyget/static/js/239.0615ec0f.chunk.js",
     "static/js/977.3bb09007.chunk.js": "/Poolspelsverktyget/static/js/977.3bb09007.chunk.js",
     "static/js/732.0aa21a9b.chunk.js": "/Poolspelsverktyget/static/js/732.0aa21a9b.chunk.js",
     "static/js/453.1b451c34.chunk.js": "/Poolspelsverktyget/static/js/453.1b451c34.chunk.js",
     "index.html": "/Poolspelsverktyget/index.html",
     "main.762cb9ff.css.map": "/Poolspelsverktyget/static/css/main.762cb9ff.css.map",
-    "main.b5bcaf27.js.map": "/Poolspelsverktyget/static/js/main.b5bcaf27.js.map",
+    "main.de8cfba8.js.map": "/Poolspelsverktyget/static/js/main.de8cfba8.js.map",
     "239.0615ec0f.chunk.js.map": "/Poolspelsverktyget/static/js/239.0615ec0f.chunk.js.map",
     "977.3bb09007.chunk.js.map": "/Poolspelsverktyget/static/js/977.3bb09007.chunk.js.map",
     "732.0aa21a9b.chunk.js.map": "/Poolspelsverktyget/static/js/732.0aa21a9b.chunk.js.map",
@@ -16,6 +16,6 @@
   },
   "entrypoints": [
     "static/css/main.762cb9ff.css",
-    "static/js/main.b5bcaf27.js"
+    "static/js/main.de8cfba8.js"
   ]
 }
