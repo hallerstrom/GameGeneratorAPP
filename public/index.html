@@ -8,12 +8,16 @@
     <title>Poolspelsverktyget</title>
 
     <!-- Manifest -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="manifest" href="/Poolspelsverktyget/manifest.json">
+
+    <!-- Apple PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/Poolspelsverktyget/icons/icon-192.png">
 
     <!-- Ikoner -->
-    <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/icons/icon-192.png" />
-    <link rel="icon" type="image/png" sizes="512x512" href="%PUBLIC_URL%/icons/icon-512.png" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/icons/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/Poolspelsverktyget/icons/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/Poolspelsverktyget/icons/icon-512.png" />
   </head>
   <body>
     <noscript>Du måste ha JavaScript aktiverat för att denna applikation ska fungera.</noscript>
@@ -23,7 +27,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker
-          .register(`${process.env.PUBLIC_URL}/sw.js`)
+          .register('/Poolspelsverktyget/sw.js')
           .then(() => console.log("Service Worker registrerad!"))
           .catch(err => console.error("SW-fel:", err));
       }
