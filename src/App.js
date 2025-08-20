@@ -350,7 +350,11 @@ function App() {
   return (
     <div className="app-container">
       <header className="header">
-        <h1>Poolspelsverktyget</h1>
+        <img
+          src={`${process.env.PUBLIC_URL}/icons/icon-180.png`}
+          alt="Poolspelsverktyget"
+          className="header-logo"
+        />
       </header>
       
       <main className="main-content">
