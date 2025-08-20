@@ -1,14 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description" content="En enkel applikation för att generera spelscheman, laguppdelningar och kioskscheman." />
+    <meta name="theme-color" content="#34c234" />
+    <meta
+      name="description"
+      content="En enkel applikation för att generera spelscheman, laguppdelningar och kioskscheman."
+    />
+
     <title>Poolspelsverktyget</title>
+
+    <!-- Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Ikoner -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   </head>
   <body>
     <noscript>Du måste ha JavaScript aktiverat för att denna applikation ska fungera.</noscript>
     <div id="root"></div>
+
+    <!-- Registrera Service Worker -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then(() => console.log("Service Worker registrerad!"))
+          .catch((err) => console.error("SW-fel:", err));
+      }
+    </script>
   </body>
 </html>
