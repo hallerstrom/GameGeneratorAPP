@@ -44,79 +44,86 @@ function App() {
     setTeamNames(newTeamNames);
   };
 
-  const handleGenerateSchedule = ({
-    numTeams,
-    teamNames,
-    useMatchTimes,
-    firstMatchTime,
-    pauseDuration,
-    matchDuration,
-  }) => {
-    setError('');
-    setSchedule(null);
-    setGeneratedTeams([]);
+const handleGenerateSchedule = ({
+  numTeams,
+  teamNames,
+  useMatchTimes,
+  firstMatchTime,
+  pauseDuration,
+  matchDuration,
+}) => {
+  setError('');
+  setSchedule(null);
+  setGeneratedTeams([]);
 
-    const teams = teamNames.filter((name) => name.trim() !== '');
-    if (teams.length < 2) {
-      setError('Minst två lag måste anges.');
+  // Filtrera bort tomma lag
+  const teams = teamNames.filter(name => name.trim() !== '');
+  if (teams.length < 2) {
+    setError('Minst två lag måste anges.');
+    return;
+  }
+
+  let pause = 0;
+  let match = 0;
+
+  if (useMatchTimes) {
+    if (!firstMatchTime) {
+      setError('Starttid måste anges.');
       return;
     }
 
-    if (useMatchTimes) {
-      if (!firstMatchTime) {
-        setError('Starttid måste anges.');
-        return;
-      }
-      if (
-        pauseDuration === '' || isNaN(pauseDuration) || pauseDuration < 0 ||
-        matchDuration === '' || isNaN(matchDuration) || matchDuration < 0
-      ) {
-        setError('Match- och paustid måste anges och vara positiva nummer.');
-        return;
-      }
-    }
+    // Konvertera till nummer
+    pause = Number(pauseDuration);
+    match = Number(matchDuration);
 
-    let tempTeams = [...teams];
-    const rounds = [];
-    if (tempTeams.length % 2 !== 0) {
-      tempTeams.push(null);
+    if (isNaN(pause) || pause < 0 || isNaN(match) || match < 0) {
+      setError('Match- och paustid måste anges och vara positiva nummer.');
+      return;
     }
-    const numRounds = tempTeams.length - 1;
-    const half = tempTeams.length / 2;
-    for (let round = 0; round < numRounds; round++) {
-      const currentRound = [];
-      for (let i = 0; i < half; i++) {
-        const homeTeam = tempTeams[i];
-        const awayTeam = tempTeams[tempTeams.length - 1 - i];
-        if (homeTeam && awayTeam) {
-          currentRound.push({ homeTeam: homeTeam, awayTeam: awayTeam });
-        }
+  }
+
+  // Skapa schemat
+  let tempTeams = [...teams];
+  const rounds = [];
+  if (tempTeams.length % 2 !== 0) tempTeams.push(null);
+  const numRounds = tempTeams.length - 1;
+  const half = tempTeams.length / 2;
+
+  for (let round = 0; round < numRounds; round++) {
+    const currentRound = [];
+    for (let i = 0; i < half; i++) {
+      const homeTeam = tempTeams[i];
+      const awayTeam = tempTeams[tempTeams.length - 1 - i];
+      if (homeTeam && awayTeam) {
+        currentRound.push({ homeTeam, awayTeam });
       }
-      rounds.push(currentRound);
-      const last = tempTeams.pop();
-      tempTeams.splice(1, 0, last);
     }
-    
-    if (useMatchTimes) {
-        let currentTime = new Date(`1970-01-01T${firstMatchTime}`);
-        
-        rounds.forEach(round => {
-          round.forEach(match => {
-            const matchStart = new Date(currentTime);
-            const matchEnd = new Date(currentTime.getTime() + matchDuration * 60000);
+    rounds.push(currentRound);
 
-            const matchStartTimeFormatted = matchStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const matchEndTimeFormatted = matchEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            match.time = `${matchStartTimeFormatted} - ${matchEndTimeFormatted}`;
-            
-            currentTime = new Date(matchEnd.getTime() + pauseDuration * 60000);
-          });
-        });
-    }
+    const last = tempTeams.pop();
+    tempTeams.splice(1, 0, last);
+  }
 
-    setSchedule(rounds);
-  };
+  // Lägg till tider om behövs
+  if (useMatchTimes) {
+    let currentTime = new Date(`1970-01-01T${firstMatchTime}`);
+
+    rounds.forEach(round => {
+      round.forEach(matchObj => {
+        const matchStart = new Date(currentTime);
+        const matchEnd = new Date(currentTime.getTime() + match * 60000);
+
+        matchObj.time = `${matchStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${matchEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+        currentTime = new Date(matchEnd.getTime() + pause * 60000);
+      });
+    });
+  }
+
+  setGeneratedTeams(teams);
+  setSchedule(rounds);
+};
+
 
   const handleGenerateTeams = ({ numTeams, players }) => {
     setError('');
